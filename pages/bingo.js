@@ -9,23 +9,27 @@ const Bingo = () => {
   const NUMBERS = Array.from({length: 75}, (_, i) => i + 1)
   const cards = new Set()
   const pages = []
-  for (let l = 0; l < 60; l++) {
-    const page = []
-    for (let m = 0; m < 4; m++) {
-      const card = NUMBERS.slice(0)
-      for (let i = card.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [card[i], card[j]] = [card[j], card[i]];
+  for (let l = 0; l < 10; l++) {
+    const png = []
+    for (let n = 0; n < 6; n++) {
+      const page = []
+      for (let m = 0; m < 4; m++) {
+        const card = NUMBERS.slice(0)
+        for (let i = card.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [card[i], card[j]] = [card[j], card[i]];
+        }
+        const candidate = card.slice(0,25)
+        const str = JSON.stringify(candidate)
+        if (cards.has(str)) m--
+        else {
+          page.push(candidate)
+          cards.add(str)
+        }
       }
-      const candidate = card.slice(0,25)
-      const str = JSON.stringify(candidate)
-      if (cards.has(str)) m--
-      else {
-        page.push(candidate)
-        cards.add(str)
-      }
+      png.push(page)
     }
-    pages.push(page)
+    pages.push(png)
   }
   const INITIALS = {
     top: '145px',
@@ -65,12 +69,14 @@ const Bingo = () => {
   }
   const [numCards, setNumCards] = useState(1)
   const numCardsInput = useRef(null)
-  const bingos = useRef(null)
+  const bingos = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)]
   const exportPng = () => {
-    toPng(bingos.current)
+    for (const bingo of bingos) {
+      toPng(bingo.current, {cacheBust: true})
       .then(dataUrl => {
-        download(dataUrl, 'bingos.png')
+        download(dataUrl, `bingos.png`)
       })
+    }
   }
   return (
     <div>
@@ -91,19 +97,22 @@ const Bingo = () => {
       <input ref={numCardsInput} defaultValue={1} />
       <button onClick={() => setNumCards(parseInt(numCardsInput.current.value))}>Generate X Cards</button>
       <button onClick={exportPng}>Export as PNG</button>
-      <div ref={bingos}>
-      {[...Array(Math.min(numCards, 60)).keys()].map(i => 
-      <div style={{position: "relative"}} key={i}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', position: 'absolute', top, left, zIndex: 10, rowGap: bingoRowGap, columnGap: bingoColGap }}>
-          <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={pages[i][0]}/>
-          <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={pages[i][1]}/>
-          <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={pages[i][2]}/>
-          <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={pages[i][3]}/>
-        </div>
-        <Image src={bingo} alt="bingo" />
-      </div>)}
+      {[...Array(pages.length).keys()].map(i => 
+      <div key={i} ref={bingos[i]}>
+        {pages[i].map((page, ind) => (
+          <div style={{position: "relative"}} key={ind}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', position: 'absolute', top, left, zIndex: 10, rowGap: bingoRowGap, columnGap: bingoColGap }}>
+              <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={page[0]}/>
+              <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={page[1]}/>
+              <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={page[2]}/>
+              <BingoNumbers font={font} rowGap={rowGap} colGap={colGap} nums={page[3]}/>
+            </div>
+            <img src={bingo.src} alt="bingo" style={{width: "100%"}}/>
+          </div>
+        ))
+        }
       </div>
-      
+      )}    
     </div>
   )
 }
