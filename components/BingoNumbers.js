@@ -1,4 +1,4 @@
-const BingoNumbers = ({ top, left, rowGap, colGap, font, nums }) => {
+const BingoNumbers = ({ rowGap, colGap, font, nums }) => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', rowGap: `${rowGap}`, columnGap: `${colGap}`, justifyItems: 'center', alignItems: 'center' }}>
       {nums.map((i, index) => (
