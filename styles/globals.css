@@ -1,0 +1,17 @@
+@import url('http://fonts.cdnfonts.com/css/gotham');
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Gotham', sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
